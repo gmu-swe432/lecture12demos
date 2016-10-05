@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ReactFire Demo</title>
+    <!-- Super important: use react with addons!!! -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react-with-addons.js"></script>
+    <script src="https://fb.me/react-dom-15.0.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase.js"></script>
+    <!-- ReactFire -->
+    <script src="https://cdn.firebase.com/libs/reactfire/1.0.0/reactfire.min.js"></script>
+
+
+    <script type="text/javascript" src="../jasmine/lib/jasmine-2.5.2/jasmine.js"></script>
+    <script type="text/javascript" src="../jasmine/lib/jasmine-2.5.2/jasmine-html.js"></script>
+    <script type="text/javascript" src="../jasmine/lib/jasmine-2.5.2/boot.js"></script>
+    <link rel="stylesheet" type="text/css" href="../jasmine/lib/jasmine-2.5.2/jasmine.css">
+
+</head>
+<body>
+<div id="container">
+    <!-- This element's contents will be replaced with your component. -->
+</div>
+<script type="text/babel">
+    "use strict";
+    var config = {
+        apiKey: "AIzaSyBgPHiUhiub1pq_anz2IVTWlC_Y19AXhSQ",
+        authDomain: "swe432foobar.firebaseapp.com",
+        databaseURL: "https://swe432foobar.firebaseio.com",
+        storageBucket: "swe432foobar.appspot.com",
+        messagingSenderId: "275251107"
+    };
+    firebase.initializeApp(config);
+
+    var TodoList = React.createClass({
+        render: function () {
+            var _this = this; //In the subcomponent, "this" will refer to window, so need to save "this" here
+            var createItem = function (item, key) {
+                return (<div key={key}><input type="text" onChange={_this.props.onChange.bind(null, item['.key'])}
+                                              value={item.text}/>
+                    <button onClick={_this.props.removeItem.bind(null, item['.key'])}>&#x2716;</button>
+                </div>);
+            };
+            return <ul>{this.props.items.map(createItem)}</ul>;
+        }
+    });
+    var TodoApp = React.createClass({
+        mixins: [ReactFireMixin],
+        getInitialState: function () {
+            return {items: []};
+        },
+        componentWillMount: function () {
+            this.fireRef = firebase.database().ref('todos');
+
+            this.bindAsArray(this.fireRef, "items");
+        },
+        onChange: function (fireKey, event) {
+            this.fireRef.child(fireKey).set({"text": event.target.value});
+        },
+        removeItem: function (key) {
+            this.fireRef.child(key).remove();
+        },
+
+        handleAdd: function (e) {
+            this.fireRef.push({"text": ""});
+        },
+        render: function () {
+            return (
+                    <div>
+                        <h3>TODO</h3>
+                        <TodoList items={this.state.items} removeItem={this.removeItem} onChange={this.onChange}/>
+                        <button onClick={this.handleAdd}>New</button>
+                    </div>
+            );
+        }
+    });
+
+    ReactDOM.render(<TodoApp />, document.getElementById('container'));
+
+    describe('TodoApp', function() {
+        var TestUtils = React.addons.TestUtils;
+        var component, element, renderedDOM;
+        beforeEach(function(){
+            element = React.createElement(
+                    TodoApp, // component class
+                    {} // props go here
+            );
+            expect(function() {
+                component = TestUtils.renderIntoDocument(element);
+            }).not.toThrow();
+        });
+        it("Has a new button", function(){
+            let button = TestUtils.findRenderedDOMComponentWithTag(component,"button");
+            expect(button).not.toBeUndefined();
+            expect(button.innerHTML).toBe("New");
+        });
+        it("When the new button is clicked, creates a new item in firebase", function(){
+
+        });
+    });
+</script>
+</body>
+</html>
