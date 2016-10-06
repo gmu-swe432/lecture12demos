@@ -92,6 +92,11 @@
         });
         it("Has a new button", function () {
             let buttons = TestUtils.scryRenderedDOMComponentsWithTag(todoAppComponent, "button");
+            /*
+            Warning: Anti-pattern: should *not* have this hard-coded index into the button array
+            Better: Add an ID to that button, and then find it
+            Same applies everywhere else below that we use the same anti-pattern
+             */
             expect(buttons[1]).not.toBeUndefined();
             expect(buttons[1].innerHTML).toBe("New");
         });
@@ -129,8 +134,8 @@
                 var deleteSpy;
                 deleteSpy = jasmine.createSpy("remove");
                 spyOn(todoAppComponent.fireRef, "child").and.returnValue({remove : deleteSpy});
-                var inputs = TestUtils.scryRenderedDOMComponentsWithTag(todoListComponent,"button");
-                TestUtils.Simulate.click(inputs[0]);
+                var deleteButtons = TestUtils.scryRenderedDOMComponentsWithTag(todoListComponent,"button");
+                TestUtils.Simulate.click(deleteButtons[0]);
                 expect(todoAppComponent.fireRef.child).toHaveBeenCalled();
                 expect(deleteSpy).toHaveBeenCalled();
             });
