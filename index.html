@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="demos">
+<head>
+    <meta charset="UTF-8">
+    <title>SWE 432 Lecture 12 Demos</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
+</head>
+<body data-ng-controller="DemoController">
+<h1>Demos for Jasmine:</h1>
+<ul>
+    <li ng-repeat="example in examples"><a href="{{example.url}}">{{example.name}}</a></li>
+</ul>
+<script>
+    function DemoController($scope) {
+        $scope.examples = [
+            {url:"01investments/", name: "1: Investments"},
+            {url:"02todojasmine/", name: "2: Todo"}
+        ];
+    }
+
+    var myApp = angular.module('demos', []);
+    myApp.controller("DemoController", DemoController);
+</script>
+</body>
+</html>
